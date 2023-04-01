@@ -1,0 +1,166 @@
+#include "viewer.h"
+
+#test open_file1
+    data obj = {0};
+    char filename[1000] = {"./objects/nofile.obj"};
+    int origin_result = 1;
+    int result = start(filename, &obj);
+    ck_assert_int_eq(result, origin_result);
+
+#test open_file2
+    data obj = {0};
+    char filename[1000] = {"./objects/cube.obj"};
+    int origin_result = 0;
+    int result = start(filename, &obj);
+    ck_assert_int_eq(result, origin_result);
+
+#test init_project1
+    data obj = {0};
+    char filename[1000] = {"./objects/empty.obj"};
+    int origin_result = 1;
+    int result = start(filename, &obj);
+    ck_assert_int_eq(result, origin_result);
+
+#test init_project2
+    data obj = {0};
+    char filename[1000] = {"./objects/empty_f.obj"};
+    int origin_result = 1;
+    int result = start(filename, &obj);
+    ck_assert_int_eq(result, origin_result);
+    clear_project(&obj);
+
+#test init_project3
+    data obj = {0};
+    char filename[1000] = {"./objects/kub_test.obj"};
+    int origin_vertex = 36;
+    int origin_facets = 34;
+    int origin_result = 0;
+    int result = start(filename, &obj);
+    ck_assert_int_eq(result, origin_result);
+    ck_assert_int_eq(obj.number_of_vertexes, origin_vertex);
+    ck_assert_int_eq(obj.facets, origin_facets);
+    clear_project(&obj);
+
+#test init_project4
+    data obj = {0};
+    char filename[1000] = {"./objects/kub.obj"};
+    int origin_vertex = 8;
+    int origin_facets = 6;
+    int origin_result = 0;
+    int result = start(filename, &obj);
+    ck_assert_int_eq(result, origin_result);
+    ck_assert_int_eq(obj.number_of_vertexes, origin_vertex);
+    ck_assert_int_eq(obj.facets, origin_facets);
+    clear_project(&obj);
+
+#test afin_transition_x
+    double x = 4.65;
+    data obj = {0};
+    char filename[1000] = {"./objects/cube.obj"};
+    int origin_status = 0;
+    int status = start(filename, &obj);
+    ck_assert_int_eq(status, origin_status);
+    double *origin = obj.matrix_object;
+    for (unsigned int i = 0; i < obj.number_of_vertexes*3; i+=3) {
+        origin[i] += x;
+    }
+    transition(obj.matrix_object, obj.number_of_vertexes, 0, x);
+    
+    for (unsigned int i = 0; i < obj.number_of_vertexes*3; i++) {
+        ck_assert_double_eq(obj.matrix_object[i], origin[i]);
+    }
+    clear_project(&obj);
+
+#test afin_transition_y
+    double y = -0.3456;
+    data obj = {0};
+    char filename[1000] = {"./objects/cube.obj"};
+    int origin_status = 0;
+    int status = start(filename, &obj);
+    ck_assert_int_eq(status, origin_status);
+    double *origin = obj.matrix_object;
+    for (unsigned int i = 1; i < obj.number_of_vertexes*3; i+=3) {
+        origin[i] += y;
+    }
+    transition(obj.matrix_object, obj.number_of_vertexes, 1, y);
+    
+    for (unsigned int i = 0; i < obj.number_of_vertexes*3; i++) {
+        ck_assert_double_eq(obj.matrix_object[i], origin[i]);
+    }
+    clear_project(&obj);
+
+#test afin_transition_z
+    double z = -345346/5675;
+    data obj = {0};
+    char filename[1000] = {"./objects/cube.obj"};
+    int origin_status = 0;
+    int status = start(filename, &obj);
+    ck_assert_int_eq(status, origin_status);
+    double *origin = obj.matrix_object;
+    for (unsigned int i = 2; i < obj.number_of_vertexes*3; i+=3) {
+        origin[i] += z;
+    }
+    transition(obj.matrix_object, obj.number_of_vertexes, 2, z);
+    
+    for (unsigned int i = 0; i < obj.number_of_vertexes*3; i++) {
+        ck_assert_double_eq(obj.matrix_object[i], origin[i]);
+    }
+    clear_project(&obj);
+
+#test reset_scale
+    data obj = {0};
+    char filename[1000] = {"./objects/lamp.obj"};
+    int origin_result = 0;
+    int result = start(filename, &obj);
+    ck_assert_int_eq(result, origin_result);
+    int origin_scale_status = 0;
+    ck_assert_int_eq(scaleReset(obj.matrix_object, obj.number_of_vertexes), origin_scale_status);
+    clear_project(&obj);
+
+#test afin_rotate_x
+    double x = 45;
+    data obj = {0};
+    data origin = {0};
+    char filename[1000] = {"./objects/cube_new.obj"};
+    char origin_filename[1000] = {"./objects/cube_45_X.obj"};
+    int origin_status = start(origin_filename, &origin);
+    int status = start(filename, &obj);
+    ck_assert_int_eq(status, origin_status);
+    rotate_x(obj.matrix_object, obj.number_of_vertexes, x);
+    for (unsigned int i = 0; i < obj.number_of_vertexes*3; i++) {
+        ck_assert_double_eq_tol(obj.matrix_object[i], origin.matrix_object[i], 1e-6);
+    }
+    clear_project(&obj);
+    clear_project(&origin);
+
+#test afin_rotate_y
+    double y = 45;
+    data obj = {0};
+    data origin = {0};
+    char filename[1000] = {"./objects/cube_new.obj"};
+    char origin_filename[1000] = {"./objects/cube_45_Z.obj"};
+    int origin_status = start(origin_filename, &origin);
+    int status = start(filename, &obj);
+    ck_assert_int_eq(status, origin_status);
+    rotate_y(obj.matrix_object, obj.number_of_vertexes, y);
+    for (unsigned int i = 0; i < obj.number_of_vertexes*3; i++) {
+        ck_assert_double_eq_tol(obj.matrix_object[i], origin.matrix_object[i], 1e-06);
+    }
+    clear_project(&obj);
+    clear_project(&origin);
+
+#test afin_rotate_z
+    double z = 45;
+    data obj = {0};
+    data origin = {0};
+    char filename[1000] = {"./objects/cube_new.obj"};
+    char origin_filename[1000] = {"./objects/cube_45_Y.obj"};
+    int origin_status = start(origin_filename, &origin);
+    int status = start(filename, &obj);
+    ck_assert_int_eq(status, origin_status);
+    rotate_z(obj.matrix_object, obj.number_of_vertexes, z);
+    for (unsigned int i = 0; i < obj.number_of_vertexes*3; i++) {
+        ck_assert_double_eq_tol(obj.matrix_object[5], origin.matrix_object[5], 1e-06);
+    }
+    clear_project(&obj);
+    clear_project(&origin);

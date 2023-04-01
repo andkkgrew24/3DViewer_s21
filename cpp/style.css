@@ -1,0 +1,12 @@
+
+/* Общие стили для программы */
+
+QMainWindow {
+   font-size: 10pt;
+
+}
+
+QRadioButton {
+    font-size: 11pt;
+
+}
